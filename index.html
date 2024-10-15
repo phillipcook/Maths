@@ -142,10 +142,10 @@
                         if (includeMissingOperands && Math.random() < 0.3) {
                             // Generate missing operand problem
                             let missingOperand = Math.floor(Math.random() * 2) + 1; // 1 or 2
+                            let num1, num2, result;
                             switch (operator) {
                                 case '+':
                                     if (missingOperand == 1) {
-                                        let num2, result;
                                         do {
                                             num2 = getRandomInt(minNum, maxNum);
                                             result = getRandomInt(minNum, maxNum);
@@ -154,7 +154,6 @@
                                         problem = emptyBox + ' + ' + num2 + ' = ' + result;
                                         hasEmptyBox = true;
                                     } else {
-                                        let num1, result;
                                         do {
                                             num1 = getRandomInt(minNum, maxNum);
                                             result = getRandomInt(minNum, maxNum);
@@ -166,7 +165,6 @@
                                     break;
                                 case '-':
                                     if (missingOperand == 1) {
-                                        let num2, result;
                                         do {
                                             num2 = getRandomInt(minNum, maxNum);
                                             result = getRandomInt(minNum, maxNum);
@@ -175,7 +173,6 @@
                                         problem = emptyBox + ' - ' + num2 + ' = ' + result;
                                         hasEmptyBox = true;
                                     } else {
-                                        let num1, result;
                                         do {
                                             num1 = getRandomInt(minNum, maxNum);
                                             result = getRandomInt(minNum, maxNum);
@@ -187,20 +184,18 @@
                                     break;
                                 case '*':
                                     if (missingOperand == 1) {
-                                        let num2, result;
                                         do {
                                             num2 = getRandomInt(minNum, maxNum) || 1;
                                             result = getRandomInt(minNum, maxNum);
-                                            answer = result / num2;
+                                            answer = Math.floor(result / num2);
                                         } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (result % num2 !== 0));
                                         problem = emptyBox + ' × ' + num2 + ' = ' + result;
                                         hasEmptyBox = true;
                                     } else {
-                                        let num1, result;
                                         do {
                                             num1 = getRandomInt(minNum, maxNum) || 1;
                                             result = getRandomInt(minNum, maxNum);
-                                            answer = result / num1;
+                                            answer = Math.floor(result / num1);
                                         } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (result % num1 !== 0));
                                         problem = num1 + ' × ' + emptyBox + ' = ' + result;
                                         hasEmptyBox = true;
@@ -208,20 +203,18 @@
                                     break;
                                 case '/':
                                     if (missingOperand == 1) {
-                                        let num2, result;
                                         do {
                                             num2 = getRandomInt(minNum, maxNum) || 1;
-                                            result = getRandomInt(minNum, maxNum);
+                                            result = getRandomInt(minNum, maxNum) || 1;
                                             answer = result * num2;
                                         } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
                                         problem = emptyBox + ' ÷ ' + num2 + ' = ' + result;
                                         hasEmptyBox = true;
                                     } else {
-                                        let num1, result;
                                         do {
                                             num1 = getRandomInt(minNum, maxNum) || 1;
                                             result = getRandomInt(minNum, maxNum) || 1;
-                                            answer = num1 / result;
+                                            answer = Math.floor(num1 / result);
                                         } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (num1 % result !== 0));
                                         problem = num1 + ' ÷ ' + emptyBox + ' = ' + result;
                                         hasEmptyBox = true;
@@ -230,9 +223,9 @@
                             }
                         } else {
                             // Generate regular problem
+                            let num1, num2, multiplier;
                             switch (operator) {
                                 case '+':
-                                    let num1, num2;
                                     do {
                                         num1 = getRandomInt(minNum, maxNum);
                                         num2 = getRandomInt(minNum, maxNum);
@@ -260,7 +253,6 @@
                                     hasEmptyBox = false;
                                     break;
                                 case '/':
-                                    let multiplier;
                                     do {
                                         do {
                                             num2 = getRandomInt(minNum, maxNum);
