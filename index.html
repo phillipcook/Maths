@@ -301,7 +301,12 @@
                     answerInput.onblur = function() {
                         this.classList.remove('highlight');
                     };
-                    answerInput.oninput = function() {
+                    answerInput.onkeydown = function(event) {
+                        if (event.key === 'Enter') {
+                            handleAnswerInput(this);
+                        }
+                    };
+                    answerInput.onchange = function() {
                         handleAnswerInput(this);
                     };
                     answerCell.appendChild(answerInput);
@@ -350,6 +355,8 @@
                     inputField.dataset.answeredCorrectly = 'true';
                     updateScore();
                 }
+                // Move focus to next unanswered question
+                focusNextEmptyAnswer();
             } else {
                 // Incorrect answer
                 inputField.classList.remove('correct');
@@ -369,9 +376,6 @@
                 // Update the problem text
                 problemData.problemText = updatedProblem;
             }
-
-            // Focus next empty answer
-            focusNextEmptyAnswer();
         }
 
         function updateScore() {
@@ -398,7 +402,8 @@
         // Handle clicks outside answer input fields
         document.addEventListener('mousedown', function(event) {
             let isClickInsideAnswerInput = event.target.tagName === 'INPUT' && answerCells.includes(event.target);
-            if (!isClickInsideAnswerInput) {
+            let isClickInsideSettings = event.target.closest('#settingsForm') !== null;
+            if (!isClickInsideAnswerInput && !isClickInsideSettings) {
                 focusNextEmptyAnswer();
             }
         });
