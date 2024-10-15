@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Problems Generator</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 5px;
+            text-align: center;
+        }
+        input[type="text"], input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .correct {
+            background-color: lightgreen;
+        }
+        .incorrect {
+            background-color: lightcoral;
+        }
+        #scoreDisplay {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        let answerCells = [];
+        let problemCells = [];
+        let problemsData = [];
+        let totalProblems = 0;
+        let correctAnswers = 0;
+
+        function generateProblems() {
+            // Clear previous problems and data
+            let problemsArea = document.getElementById('problemsArea');
+            problemsArea.innerHTML = '';
+            answerCells = [];
+            problemCells = [];
+            problemsData = [];
+            totalProblems = 0;
+            correctAnswers = 0;
+            updateScore();
+
+            // Read settings
+            let minNum = parseInt(document.getElementById('minNum').value);
+            let maxNum = parseInt(document.getElementById('maxNum').value);
+            let allowNegativeAnswers = document.getElementById('allowNegativeAnswers').checked;
+            let includeMissingOperands = document.getElementById('includeMissingOperands').checked;
+            
+            // Get selected operators
+            let operators = [];
+            if (document.getElementById('addOperator').checked) operators.push('+');
+            if (document.getElementById('subtractOperator').checked) operators.push('-');
+            if (document.getElementById('multiplyOperator').checked) operators.push('*');
+            if (document.getElementById('divideOperator').checked) operators.push('/');
+            
+            if (operators.length == 0) {
+                alert("No operators selected. Please select at least one operator.");
+                return;
+            }
+
+            let generatedProblems = {};
+            let maxAttempts = 300;
+            let emptyBox = '⬜'; // Unicode character for white large square
+
+            let table = document.createElement('table');
+
+            // Generate 10 rows of problems
+            for (let row = 0; row < 10; row++) {
+                let tr = document.createElement('tr');
+
+                // Generate 6 problem-answer pairs per row
+                for (let col = 0; col < 6; col++) {
+                    let attempt = 0;
+                    let problem = '';
+                    let answer = '';
+                    let hasEmptyBox = false;
+                    let problemData = {};
+
+                    do {
+                        attempt++;
+                        // Randomly select an operator
+                        let operator = operators[Math.floor(Math.random() * operators.length)];
+                        // Decide whether to include missing operand problem
+                        if (includeMissingOperands && Math.random() < 0.3) {
+                            // Generate missing operand problem
+                            let missingOperand = Math.floor(Math.random() * 2) + 1; // 1 or 2
+                            switch (operator) {
+                                case '+':
+                                    if (missingOperand == 1) {
+                                        let num2, result;
+                                        do {
+                                            num2 = getRandomInt(minNum, maxNum);
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result - num2;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
+                                        problem = emptyBox + ' + ' + num2 + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    } else {
+                                        let num1, result;
+                                        do {
+                                            num1 = getRandomInt(minNum, maxNum);
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result - num1;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
+                                        problem = num1 + ' + ' + emptyBox + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    }
+                                    break;
+                                case '-':
+                                    if (missingOperand == 1) {
+                                        let num2, result;
+                                        do {
+                                            num2 = getRandomInt(minNum, maxNum);
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result + num2;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
+                                        problem = emptyBox + ' - ' + num2 + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    } else {
+                                        let num1, result;
+                                        do {
+                                            num1 = getRandomInt(minNum, maxNum);
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = num1 - result;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
+                                        problem = num1 + ' - ' + emptyBox + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    }
+                                    break;
+                                case '*':
+                                    if (missingOperand == 1) {
+                                        let num2, result;
+                                        do {
+                                            num2 = getRandomInt(minNum, maxNum) || 1;
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result / num2;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (result % num2 !== 0));
+                                        problem = emptyBox + ' × ' + num2 + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    } else {
+                                        let num1, result;
+                                        do {
+                                            num1 = getRandomInt(minNum, maxNum) || 1;
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result / num1;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (result % num1 !== 0));
+                                        problem = num1 + ' × ' + emptyBox + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    }
+                                    break;
+                                case '/':
+                                    if (missingOperand == 1) {
+                                        let num2, result;
+                                        do {
+                                            num2 = getRandomInt(minNum, maxNum) || 1;
+                                            result = getRandomInt(minNum, maxNum);
+                                            answer = result * num2;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0));
+                                        problem = emptyBox + ' ÷ ' + num2 + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    } else {
+                                        let num1, result;
+                                        do {
+                                            num1 = getRandomInt(minNum, maxNum) || 1;
+                                            result = getRandomInt(minNum, maxNum) || 1;
+                                            answer = num1 / result;
+                                        } while ((!allowNegativeAnswers && answer < 0) || (!allowNegativeAnswers && result < 0) || (num1 % result !== 0));
+                                        problem = num1 + ' ÷ ' + emptyBox + ' = ' + result;
+                                        hasEmptyBox = true;
+                                    }
+                                    break;
+                            }
+                        } else {
+                            // Generate regular problem
+                            switch (operator) {
+                                case '+':
+                                    let num1, num2;
+                                    do {
+                                        num1 = getRandomInt(minNum, maxNum);
+                                        num2 = getRandomInt(minNum, maxNum);
+                                        answer = num1 + num2;
+                                    } while ((!allowNegativeAnswers && answer < 0));
+                                    problem = num1 + ' + ' + num2 + ' = ';
+                                    hasEmptyBox = false;
+                                    break;
+                                case '-':
+                                    do {
+                                        num1 = getRandomInt(minNum, maxNum);
+                                        num2 = getRandomInt(minNum, maxNum);
+                                        answer = num1 - num2;
+                                    } while ((!allowNegativeAnswers && answer < 0));
+                                    problem = num1 + ' - ' + num2 + ' = ';
+                                    hasEmptyBox = false;
+                                    break;
+                                case '*':
+                                    do {
+                                        num1 = getRandomInt(minNum, maxNum);
+                                        num2 = getRandomInt(minNum, maxNum);
+                                        answer = num1 * num2;
+                                    } while ((!allowNegativeAnswers && answer < 0));
+                                    problem = num1 + ' × ' + num2 + ' = ';
+                                    hasEmptyBox = false;
+                                    break;
+                                case '/':
+                                    let multiplier;
+                                    do {
+                                        do {
+                                            num2 = getRandomInt(minNum, maxNum);
+                                        } while (num2 == 0);
+                                        multiplier = getRandomInt(minNum, maxNum);
+                                        num1 = num2 * multiplier;
+                                        answer = num1 / num2;
+                                    } while ((!allowNegativeAnswers && answer < 0));
+                                    problem = num1 + ' ÷ ' + num2 + ' = ';
+                                    hasEmptyBox = false;
+                                    break;
+                            }
+                        }
+                        // Exit loop if problem is unique or max attempts reached
+                        if (!generatedProblems.hasOwnProperty(problem) || attempt >= maxAttempts) {
+                            break;
+                        }
+                    } while (true);
+
+                    generatedProblems[problem] = true;
+
+                    // Create problem cell
+                    let problemCell = document.createElement('td');
+                    problemCell.innerHTML = problem;
+                    tr.appendChild(problemCell);
+                    problemCells.push(problemCell);
+
+                    // Create answer cell with input field
+                    let answerCell = document.createElement('td');
+                    let answerInput = document.createElement('input');
+                    answerInput.type = 'text';
+                    answerInput.dataset.answer = answer;
+                    answerInput.dataset.problemIndex = problemCells.length - 1;
+                    answerInput.dataset.hasEmptyBox = hasEmptyBox;
+                    answerInput.dataset.answeredCorrectly = 'false';
+                    answerInput.onfocus = function() {
+                        removeHighlight();
+                        this.classList.add('highlight');
+                    };
+                    answerInput.onblur = function() {
+                        this.classList.remove('highlight');
+                    };
+                    answerInput.onchange = function() {
+                        handleAnswerInput(this);
+                    };
+                    answerCell.appendChild(answerInput);
+                    tr.appendChild(answerCell);
+                    answerCells.push(answerInput);
+
+                    // Store problem data
+                    problemData = {
+                        problemText: problem,
+                        answer: answer,
+                        hasEmptyBox: hasEmptyBox,
+                        problemCell: problemCell,
+                        answerInput: answerInput,
+                        answeredCorrectly: false
+                    };
+                    problemsData.push(problemData);
+                    totalProblems++;
+                }
+                table.appendChild(tr);
+            }
+            problemsArea.appendChild(table);
+
+            // Set focus to the first empty answer cell
+            focusNextEmptyAnswer();
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function handleAnswerInput(inputField) {
+            let problemIndex = inputField.dataset.problemIndex;
+            let problemData = problemsData[problemIndex];
+            let userAnswer = inputField.value.trim();
+            let correctAnswer = problemData.answer.toString();
+
+            if (userAnswer === correctAnswer) {
+                // Correct answer
+                inputField.classList.remove('incorrect');
+                inputField.classList.add('correct');
+                if (!problemData.answeredCorrectly) {
+                    correctAnswers++;
+                    problemData.answeredCorrectly = true;
+                    inputField.dataset.answeredCorrectly = 'true';
+                    updateScore();
+                }
+            } else {
+                // Incorrect answer
+                inputField.classList.remove('correct');
+                inputField.classList.add('incorrect');
+                if (problemData.answeredCorrectly) {
+                    correctAnswers--;
+                    problemData.answeredCorrectly = false;
+                    inputField.dataset.answeredCorrectly = 'false';
+                    updateScore();
+                }
+            }
+
+            if (problemData.hasEmptyBox) {
+                // Replace the empty box with user's answer
+                let updatedProblem = problemData.problemText.replace('⬜', '[' + userAnswer + ']');
+                problemData.problemCell.innerHTML = updatedProblem;
+                // Update the problem text
+                problemData.problemText = updatedProblem;
+            }
+
+            // Focus next empty answer
+            focusNextEmptyAnswer();
+        }
+
+        function updateScore() {
+            let scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.textContent = 'Score: ' + correctAnswers + ' / ' + totalProblems;
+        }
+
+        function focusNextEmptyAnswer() {
+            for (let i = 0; i < answerCells.length; i++) {
+                if (answerCells[i].value.trim() === '') {
+                    answerCells[i].focus();
+                    answerCells[i].classList.add('highlight');
+                    return;
+                }
+            }
+        }
+
+        function removeHighlight() {
+            for (let i = 0; i < answerCells.length; i++) {
+                answerCells[i].classList.remove('highlight');
+            }
+        }
+
+        // Handle clicks outside answer input fields
+        document.addEventListener('mousedown', function(event) {
+            let isClickInsideAnswerInput = event.target.tagName === 'INPUT' && answerCells.includes(event.target);
+            if (!isClickInsideAnswerInput) {
+                focusNextEmptyAnswer();
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Math Problems Generator</h1>
+    <div id="scoreDisplay">Score: 0 / 0</div>
+    <form id="settingsForm" onsubmit="return false;">
+        <label for="minNum">Minimum Number:</label>
+        <input type="number" id="minNum" name="minNum" value="0"><br><br>
+        <label for="maxNum">Maximum Number:</label>
+        <input type="number" id="maxNum" name="maxNum" value="10"><br><br>
+        <input type="checkbox" id="allowNegativeAnswers" name="allowNegativeAnswers">
+        <label for="allowNegativeAnswers">Allow Negative Answers</label><br><br>
+        <input type="checkbox" id="includeMissingOperands" name="includeMissingOperands">
+        <label for="includeMissingOperands">Include Missing Operands</label><br><br>
+        <p>Select Operators:</p>
+        <input type="checkbox" id="addOperator" name="operators" value="+">
+        <label for="addOperator">+</label><br>
+        <input type="checkbox" id="subtractOperator" name="operators" value="-">
+        <label for="subtractOperator">-</label><br>
+        <input type="checkbox" id="multiplyOperator" name="operators" value="*">
+        <label for="multiplyOperator">*</label><br>
+        <input type="checkbox" id="divideOperator" name="operators" value="/">
+        <label for="divideOperator">/</label><br><br>
+        <button type="button" onclick="generateProblems()">Generate Problems</button>
+    </form>
+    <br>
+    <div id="problemsArea"></div>
+</body>
+</html>
