@@ -2,7 +2,46 @@
 <html>
 <head>
     <title>Math Problems Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive Meta Tag -->
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #settingsForm {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #settingsForm > * {
+            margin: 5px 10px;
+        }
+        #settingsForm label {
+            margin-left: 5px;
+            margin-right: 15px;
+        }
+        #operatorSelection {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        #operatorSelection label {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        #operatorSelection input {
+            margin-right: 5px;
+        }
+        #scoreDisplay {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
         table, th, td {
             border: 1px solid black;
             border-collapse: collapse;
@@ -10,9 +49,11 @@
         td {
             padding: 5px;
             text-align: center;
+            word-wrap: break-word;
         }
-        input[type="text"], input[type="number"] {
-            width: 60px;
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
             text-align: center;
         }
         .highlight {
@@ -24,9 +65,17 @@
         .incorrect {
             background-color: lightcoral;
         }
-        #scoreDisplay {
-            font-size: 18px;
-            font-weight: bold;
+        @media (max-width: 600px) {
+            #settingsForm {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            table, th, td {
+                font-size: 14px;
+            }
+            td {
+                padding: 3px;
+            }
         }
     </style>
     <script>
@@ -75,8 +124,8 @@
             for (let row = 0; row < 10; row++) {
                 let tr = document.createElement('tr');
 
-                // Generate 6 problem-answer pairs per row
-                for (let col = 0; col < 6; col++) {
+                // Generate 3 problem-answer pairs per row for better mobile layout
+                for (let col = 0; col < 3; col++) {
                     let attempt = 0;
                     let problem = '';
                     let answer = '';
@@ -252,7 +301,7 @@
                     answerInput.onblur = function() {
                         this.classList.remove('highlight');
                     };
-                    answerInput.onchange = function() {
+                    answerInput.oninput = function() {
                         handleAnswerInput(this);
                     };
                     answerCell.appendChild(answerInput);
@@ -359,26 +408,41 @@
     <h1>Math Problems Generator</h1>
     <div id="scoreDisplay">Score: 0 / 0</div>
     <form id="settingsForm" onsubmit="return false;">
-        <label for="minNum">Minimum Number:</label>
-        <input type="number" id="minNum" name="minNum" value="0"><br><br>
-        <label for="maxNum">Maximum Number:</label>
-        <input type="number" id="maxNum" name="maxNum" value="10"><br><br>
-        <input type="checkbox" id="allowNegativeAnswers" name="allowNegativeAnswers">
-        <label for="allowNegativeAnswers">Allow Negative Answers</label><br><br>
-        <input type="checkbox" id="includeMissingOperands" name="includeMissingOperands">
-        <label for="includeMissingOperands">Include Missing Operands</label><br><br>
-        <p>Select Operators:</p>
-        <input type="checkbox" id="addOperator" name="operators" value="+">
-        <label for="addOperator">+</label><br>
-        <input type="checkbox" id="subtractOperator" name="operators" value="-">
-        <label for="subtractOperator">-</label><br>
-        <input type="checkbox" id="multiplyOperator" name="operators" value="*">
-        <label for="multiplyOperator">*</label><br>
-        <input type="checkbox" id="divideOperator" name="operators" value="/">
-        <label for="divideOperator">/</label><br><br>
+        <label for="minNum">Min Number:
+            <input type="number" id="minNum" name="minNum" value="0">
+        </label>
+        <label for="maxNum">Max Number:
+            <input type="number" id="maxNum" name="maxNum" value="10">
+        </label>
+        <label>
+            <input type="checkbox" id="allowNegativeAnswers" name="allowNegativeAnswers">
+            Allow Negative Answers
+        </label>
+        <label>
+            <input type="checkbox" id="includeMissingOperands" name="includeMissingOperands">
+            Include Missing Operands
+        </label>
+        <div id="operatorSelection">
+            <span>Select Operators:</span>
+            <label>
+                <input type="checkbox" id="addOperator" name="operators" value="+">
+                +
+            </label>
+            <label>
+                <input type="checkbox" id="subtractOperator" name="operators" value="-">
+                -
+            </label>
+            <label>
+                <input type="checkbox" id="multiplyOperator" name="operators" value="*">
+                ×
+            </label>
+            <label>
+                <input type="checkbox" id="divideOperator" name="operators" value="/">
+                ÷
+            </label>
+        </div>
         <button type="button" onclick="generateProblems()">Generate Problems</button>
     </form>
-    <br>
     <div id="problemsArea"></div>
 </body>
 </html>
